@@ -1,3 +1,4 @@
+
 [org 0x7c00]
 
 mov [BOOT_DISK], dl
@@ -5,21 +6,13 @@ mov [BOOT_DISK], dl
 mov bp, 0x7c00
 mov sp, bp
 
-mov si, msg
-call bios_print
+call ReadDisk
 
-call disk_read
-
-; jump into that program space
 jmp PROGRAM_SPACE
 
-jmp $
-
 %include "print.asm"
-%include "disk.asm"
-
-msg:
-    db 'Hello world', 13, 10, 0
+%include "DiskRead.asm"
 
 times 510-($-$$) db 0
-dw 0xAA55
+
+dw 0xaa55
