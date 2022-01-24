@@ -7,13 +7,11 @@ EnterProtectedMode:
     call EnableA20
     cli             ; Disable interrupts
     lgdt [gdt_desc] ; Load GDT
-    
+
     ; Protected mode time :)
     mov eax, cr0
     or eax, 1
     mov cr0, eax
-    hlt
-    ; The line below me triple faults.
     jmp codeseg:StartProtectedMode  ; Far jump
 
 ; A20 line - get the 21st bit in memory
@@ -26,6 +24,9 @@ EnableA20:
 
 [bits 32]
 
+%include "CPUID.asm"
+%include "paging.asm"
+
 StartProtectedMode:
     ; Setup
     mov ax, dataseg
@@ -34,16 +35,43 @@ StartProtectedMode:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    ; manipulate video data directly
-    mov [0xb8000], byte 'H'
-	mov [0xb8002], byte 'e'
-	mov [0xb8004], byte 'l'
-	mov [0xb8006], byte 'l'
-	mov [0xb8008], byte 'o'
-	mov [0xb800a], byte ' '
-	mov [0xb800c], byte 'W'
-	mov [0xb800e], byte 'o'
-	mov [0xb8010], byte 'r'
-	mov [0xb8012], byte 'l'
+
+    ; Things we need to do before jumping to 64 bit
+    call DetectCPUID            ; Detect CPUID - to see if long mode is supported
+    call DetectLongMode         ; Same reason as above
+    call SetUpIdentityPaging    ; Set up paging
+    call EditGDT                ; Edit GDT for 64-bit mode
+
+    ; Far jump to 64-bit mode
+    jmp $
+
+
+[bits 64]
+
+[extern _start] ; Kernel start point
+
+
+Start64Bit:
+    mov edi, 0xb8000
+    mov rax, 0x1f201f201f201f20
+    mov ecx, 500
+    rep stosq
+
+    call ActivateSSE ; Streaming SIMD Extensions
+    call _start      ; We are now in kernel space!
+
+    jmp $ ; If we exit abrutly, just hang.
+
+ActivateSSE:
+	mov rax, cr0
+	and ax, 0b11111101
+	or ax, 0b00000001
+	mov cr0, rax
+
+	mov rax, cr4
+	or ax, 0b1100000000
+	mov cr4, rax
+
+	ret
 
 times 2048-($-$$) db 0
