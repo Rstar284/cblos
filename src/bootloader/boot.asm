@@ -1,23 +1,22 @@
-bits 16
+[org 0x7c00]
 
+mov [BOOT_DISK], dl
 
-mov ax, 0x07c0
-mov ds, ax
-cld
+mov bp, 0x7c00
+mov sp, bp
 
-jmp main
+mov si, msg
+call bios_print
+
+call disk_read
+
+jmp $
 
 %include "print.asm"
+%include "disk.asm"
 
-main:
-    ; disable interrupts
-    cli
+msg:
+    db 'Hello world', 13, 10, 0
 
-    mov si, msg
-    call bios_print
-
-    msg   db 'Hello World', 13, 10, 0
-
-
-times 510 - ($-$$) db 0
+times 510-($-$$) db 0
 dw 0xAA55
