@@ -10,6 +10,9 @@ call bios_print
 
 call disk_read
 
+; jump into that program space
+jmp PROGRAM_SPACE
+
 jmp $
 
 %include "print.asm"
