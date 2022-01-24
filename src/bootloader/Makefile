@@ -11,7 +11,7 @@ bootloader: boot.asm
 
 	cat $(BIN_DIRECTORY)/boot.flp $(BIN_DIRECTORY)/extended.bin > $(BIN_DIRECTORY)/boot.bin
 test-qemu: $(BIN_DIRECTORY)/boot.bin
-	qemu-system-x86_64 -hda $^
+	qemu-system-x86_64 -fda $^
 
 clean:
 	@rm -rf $(BIN_DIRECTORY)
