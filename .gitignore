@@ -1,0 +1,5 @@
+# Editor specific
+.vscode/
+
+# if I ever forget to clean
+bin/
