@@ -5,7 +5,10 @@ all: bootloader
 
 bootloader: boot.asm
 	@mkdir -p $(BIN_DIRECTORY)/
-	@$(AS) -fbin $^ -o $(BIN_DIRECTORY)/boot.bin
+	@$(AS) -fbin $^ -o $(BIN_DIRECTORY)/bootloader.bin
+	@$(AS) -felf64 extended_sectors.asm -o $(BIN_DIRECTORY)/extended.o
+
+	cat $(BIN_DIRECTORY)/bootloader.bin $(BIN_DIRECTORY)/extended.o > $(BIN_DIRECTORY)/boot.bin
 
 test-qemu: $(BIN_DIRECTORY)/boot.bin
 	qemu-system-x86_64 -fda $^
