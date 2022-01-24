@@ -22,14 +22,37 @@ EnableA20:
 
 [bits 32]
 
-StartProtectedMode:
-    mov ax, dataseg
-    mov ds, ax
-    mov ss, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+%include "CPUID.asm"
+%include "paging.asm"
 
+StartProtectedMode:
+    ; mov ax, dataseg
+    ; mov ds, ax
+    ; mov ss, ax
+    ; mov es, ax
+    ; mov fs, ax
+    ; mov gs, ax
+
+    call DetectCPUID
+    call DetectLongMode
+    call SetUpPaging
+    call EditGDT
+
+    jmp codeseg:Start64Bit
+
+[bits 64]
+
+[extern _start]
+
+Start64Bit:
+    ; Now in 64 bit! :)
+    mov edi, 0xb8000
+    mov rax, 0x1f201f201f201f20
+    mov ecx, 500
+    rep stosq
+
+    ; TODO: get this working
+    ; and also load into kernel
     jmp $
 
 times 2048-($-$$) db 0
