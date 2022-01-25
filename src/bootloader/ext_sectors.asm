@@ -39,6 +39,8 @@ EnableA20:
 
 [bits 32]
 
+[extern _start]
+
 %include "CPUID.asm"
 %include "paging.asm"
 
@@ -55,21 +57,9 @@ StartProtectedMode:
     call SetUpPaging
     call EditGDT
 
-    jmp codeseg:Start64Bit
-
-[bits 64]
-
-[extern _start]
-
-Start64Bit:
-    ; Now in 64 bit! :)
-    mov edi, 0xb8000
-    mov rax, 0x1f201f201f201f20
-    mov ecx, 500
-    rep stosq
-
-    ; TODO: get this working
-    ; and also load into kernel
+    jmp _start
+    ; If we ever get out of kernel for any reason,
+    ; infinently jump
     jmp $
 
 times 2048-($-$$) db 0
