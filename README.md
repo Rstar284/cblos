@@ -3,7 +3,8 @@
 Minimal BIOS operating system.
 
 ## Prerequisites
-* [Make](https://github.com/gnu-mirror-unofficial/make)
+* [Git](https://github.com/git/git)
+* [Make](https://github.com/mirror/make)
 * [NASM](https://github.com/netwide-assembler/nasm)
 
 ## Build
