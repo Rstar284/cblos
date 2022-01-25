@@ -10,10 +10,10 @@ Minimal BIOS operating system.
 ## Build
 ```sh
 $ # Build the bootloader
-$ make -C src/bootloader
+$ make -C bootloader
 $
 $ # Build the kernel
-$ make -C src/kernel
+$ make -C kernel
 $
 $ # Build eveything into a single `.iso` image
 $ make
