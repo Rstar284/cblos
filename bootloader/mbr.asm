@@ -14,15 +14,46 @@
 ;;      You should have received a copy of the GNU General Public License
 ;;      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;      ======================================================================
+org 0x7c00
+bits 16
 
-PrintString:
-    mov ah, 0x0e
-    .Loop:
-        cmp [bx], byte 0
-        je .Exit
-        mov al, [bx]
-        int 0x10
-        inc bx
-        jmp .Loop
-    .Exit:
-        ret
+;; Adress where we load kernel
+KERNEL_OFFSET equ 0x1000
+
+; BIOS set boot drive in dl; store for later expansion
+mov [BOOT_DRIVE], dl
+
+;Let's set stack
+mov bp, 0x9000
+mov sp, bp
+
+call load_kernel
+call switch_to_32bit
+
+jmp $
+
+%include "readisk.asm"
+%include "gdt.asm"
+%include "switch_to_32bit.asm"
+
+bits 16
+load_kernel:
+    mov bx, KERNEL_OFFSET ; bx -> Dest
+    mov dh, 2             ; dh -> number of sectors
+    mov dl, [BOOT_DRIVE]  ; dl -> disk
+    call disk_load
+    ret
+
+bits 32
+BEGIN_32BIT:
+    call KERNEL_OFFSET ; Give control to the kernel
+    jmp $
+
+; Boot drive var
+BOOT_DRIVE db 0
+
+; Padding
+times 510 - ($-$$) db 0
+
+; Magic num
+dw 0xaa55

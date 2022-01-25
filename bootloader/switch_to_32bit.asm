@@ -15,51 +15,25 @@
 ;;      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;      ======================================================================
 
-[org 0x8000]
-
-jmp EnterProtectedMode
-
-%include "print.asm"
-%include "gdt.asm"
-
-EnterProtectedMode:
-    call EnableA20
-    cli
-    lgdt [gdt_descriptor]
+bits 16
+switch_to_32bit:
+    cli                     ; Disable interrupts
+    lgdt [gdt_descriptor]   ; Enable GDT descriptor
     mov eax, cr0
-    or eax, 1
-    mov cr0, eax
-    jmp codeseg:StartProtectedMode
+    or eax, 0x1
+    mov cr0, eax            ; Enable p mode
+    jmp CODE_SEG:init_32bit ; Farjump
 
-EnableA20:
-    in al, 0x92
-    or al, 2
-    out 0x92, al
-    ret
+bits 32
+init_32bit:
+    mov ax, DATA_SEG        ; Update segment registers
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
-[bits 32]
+    mov ebp, 0x90000        ; Setup stack
+    mov esp, ebp
 
-[extern _start]
-
-%include "CPUID.asm"
-%include "paging.asm"
-
-StartProtectedMode:
-    ; mov ax, dataseg
-    ; mov ds, ax
-    ; mov ss, ax
-    ; mov es, ax
-    ; mov fs, ax
-    ; mov gs, ax
-
-    call DetectCPUID
-    call DetectLongMode
-    call SetUpPaging
-    call EditGDT
-
-    jmp _start
-    ; If we ever get out of kernel for any reason,
-    ; infinently jump
-    jmp $
-
-times 2048-($-$$) db 0
+    call BEGIN_32BIT        ; Move back to mbr.asm
