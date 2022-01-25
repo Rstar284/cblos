@@ -4,6 +4,7 @@ Minimal BIOS operating system.
 
 ## Prerequisite
 * [Make](https://github.com/gnu-mirror-unofficial/make)
+* [NASM](https://github.com/netwide-assembler/nasm)
 
 ## Build
 ```sh
