@@ -30,7 +30,7 @@ INPUT
 
 OUTPUT
 (
-    ../bin/kernel.bin
+    cblos.bin
 )
 
 SECTIONS
