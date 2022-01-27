@@ -24,13 +24,13 @@ ENTRY(_start)
 
 INPUT
 (
-    ../bin/extended.bin    /* TODO: compile this as a object file? */
+    ../bin/extended.o    /* TODO: compile this as a object file? */
     ../bin/kernel.o
 )
 
 OUTPUT
 (
-    cblos.bin
+    ../cblos.bin
 )
 
 SECTIONS

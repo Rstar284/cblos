@@ -16,7 +16,7 @@
 #       ======================================================================
 
 # Folders
-BUILD_DIR := ../bin/
+BUILD_DIR := ../bin
 
 
 # File stuff
@@ -37,9 +37,9 @@ KERN_LOC := 0x1000		# Could also be 0x8000, not sure
 COMPILE_FLAGS := -Ttext $(KERN_LOC) $(CFLAGS)
 
 # Shortcuts to multiple subroutines at once.
-kernel: clean cblkern linkcbl
-qemu:	clean cblkern linkcbl test-qemu
-debug:	clean cblkern linkcbl debug-qemu
+kernel: cblkern linkcbl
+qemu:	cblkern linkcbl test-qemu
+debug:	cblkern linkcbl debug-qemu
 
 
 
@@ -60,7 +60,3 @@ test-qemu: cblos.bin
 
 debug-qemu: cblos.bin
 	@qemu-system-x86_64 -monitor stdio -no-shutdown -no-reboot -m 1024 -hda cblos.bin
-
-.PHONY: clean
-clean: $(BUILD_DIR)
-	@rm -rfv $^
