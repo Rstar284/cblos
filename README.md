@@ -13,9 +13,12 @@ $ # Build the bootloader
 $ make -C bootloader
 $
 $ # Build the kernel
-$ make -C kernel
+$ make -C kernel cblkern
 $
-$ # Build eveything into a single `.iso` image
-$ make
+$ # Link kernel
+$ make -C kernel linkcbl
+$
+$ # Test in qemu
+$ make -C kernel test-qemu
 ```
 > NOTE: The `$` in this context means running in your terminal.
