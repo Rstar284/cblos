@@ -48,6 +48,8 @@ linkcbl: $(O_FILE)
 	@echo "LD $^"
 	@$(LD) -T$(LDS)
 
+	@cat ../bin/boot.bin ../bin/kernel.o > ../cblos.bin
+
 test-qemu: ../cblos.bin
 	@qemu-system-x86_64 -m 512 -hda $^
 
