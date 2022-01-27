@@ -1,0 +1,59 @@
+
+/*      ====================================================================== */
+/*      Copyright (C) 2022  CBLOS's authors                                    */
+/*                                                                             */
+/*      This program is free software: you can redistribute it and/or modify   */
+/*      it under the terms of the GNU General Public License as published by   */
+/*      the Free Software Foundation, either version 3 of the License, or      */
+/*      (at your option) any later version.                                    */
+/*                                                                             */
+/*      This program is distributed in the hope that it will be useful,        */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*      GNU General Public License for more details.                           */
+/*                                                                             */
+/*      You should have received a copy of the GNU General Public License      */
+/*      along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+/*      ====================================================================== */
+
+/* This could probably be changed to x86 or elf */
+OUTPUT_FORMAT(binary)
+
+/* Entry point of kernel, see kernel.c */
+ENTRY(_start)
+
+INPUT
+(
+    ../bin/extended.bin    /* TODO: compile this as a object file? */
+    ../bin/kernel.o
+)
+
+OUTPUT
+(
+    ../bin/kernel.bin
+)
+
+SECTIONS
+{
+    . = 0x8000;
+    
+    .text : ALIGN(0x1000)
+    {
+        *(.text)
+    }
+    .data : ALIGN(0x1000)
+    {
+        *(.data)
+    }
+    .rodata : ALIGN(0x1000)
+    {
+        *(.rodata)
+    }
+    .bss : ALIGN(0x1000)
+    {
+        *(COMMON)
+        *(.bss)
+    }
+}
+
+/* EOF */
