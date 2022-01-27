@@ -20,10 +20,10 @@ BIN_DIRECTORY := ../../bin
 
 all: bootloader
 
-bootloader: boot.asm
+bootloader: mbr.asm
 	@mkdir -p $(BIN_DIRECTORY)/
 	@$(AS) -fbin $^ -o $(BIN_DIRECTORY)/boot.flp
-	@$(AS) -f bin ext_sectors.asm -o $(BIN_DIRECTORY)/extended.bin
+	@$(AS) -f bin switch_to_32bit.asm -o $(BIN_DIRECTORY)/extended.bin
 
 
 	cat $(BIN_DIRECTORY)/boot.flp $(BIN_DIRECTORY)/extended.bin > $(BIN_DIRECTORY)/boot.bin

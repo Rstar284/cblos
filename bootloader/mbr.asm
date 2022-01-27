@@ -17,8 +17,6 @@
 org 0x7c00
 bits 16
 
-;; Adress where we load kernel
-KERNEL_OFFSET equ 0x1000
 
 ; BIOS set boot drive in dl; store for later expansion
 mov [BOOT_DRIVE], dl
@@ -43,11 +41,6 @@ load_kernel:
     mov dl, [BOOT_DRIVE]  ; dl -> disk
     call disk_load
     ret
-
-bits 32
-BEGIN_32BIT:
-    call KERNEL_OFFSET ; Give control to the kernel
-    jmp $
 
 ; Boot drive var
 BOOT_DRIVE db 0

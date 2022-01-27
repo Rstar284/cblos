@@ -44,12 +44,10 @@ debug:	clean cblkern linkcbl debug-qemu
 
 
 # Subroutines
-.PHONY: clean
-clean: $(BUILD_DIR)
-	@rm -rfv $^
 
 
 cblkern: kernel.c
+	@mkdir -p ../bin/
 	@echo "CC $^"
 	@$(CC) $(COMPILE_FLAGS) -c "$(C_FILE)" -o "$(O_FILE)"
 
@@ -62,3 +60,7 @@ test-qemu: cblos.bin
 
 debug-qemu: cblos.bin
 	@qemu-system-x86_64 -monitor stdio -no-shutdown -no-reboot -m 1024 -hda cblos.bin
+
+.PHONY: clean
+clean: $(BUILD_DIR)
+	@rm -rfv $^

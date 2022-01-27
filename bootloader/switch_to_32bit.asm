@@ -15,6 +15,9 @@
 ;;      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;      ======================================================================
 
+;; Adress where we load kernel
+KERNEL_OFFSET equ 0x1000
+
 bits 16
 switch_to_32bit:
     cli                     ; Disable interrupts
@@ -25,6 +28,11 @@ switch_to_32bit:
     jmp CODE_SEG:init_32bit ; Farjump
 
 bits 32
+
+BEGIN_32BIT:
+    call KERNEL_OFFSET ; Give control to the kernel
+    jmp $
+
 init_32bit:
     mov ax, DATA_SEG        ; Update segment registers
     mov ds, ax
