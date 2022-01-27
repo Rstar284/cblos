@@ -31,7 +31,6 @@ call switch_to_32bit
 jmp $
 
 %include "readisk.asm"
-%include "gdt.asm"
 %include "switch_to_32bit.asm"
 
 bits 16

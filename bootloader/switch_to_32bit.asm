@@ -18,6 +18,8 @@
 ;; Adress where we load kernel
 KERNEL_OFFSET equ 0x1000
 
+%include "gdt.asm"
+
 bits 16
 switch_to_32bit:
     cli                     ; Disable interrupts

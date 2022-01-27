@@ -16,7 +16,7 @@
 #       ======================================================================
 
 AS	:= nasm
-BIN_DIRECTORY := ../../bin
+BIN_DIRECTORY := ../bin
 
 all: bootloader
 
