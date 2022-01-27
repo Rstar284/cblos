@@ -36,27 +36,20 @@ KERN_LOC := 0x1000		# Could also be 0x8000, not sure
 # Compiler stuff
 COMPILE_FLAGS := -Ttext $(KERN_LOC) $(CFLAGS)
 
-# Shortcuts to multiple subroutines at once.
-kernel: cblkern linkcbl
-qemu:	cblkern linkcbl test-qemu
-debug:	cblkern linkcbl debug-qemu
-
-
-
 # Subroutines
 
 
 cblkern: kernel.c
 	@mkdir -p ../bin/
 	@echo "CC $^"
-	@$(CC) $(COMPILE_FLAGS) -c "$(C_FILE)" -o "$(O_FILE)"
+	@$(CC) -Ttext 0x1000 -ffreestanding -mno-red-zone -c kernel.c -o ../bin/kernel.o
 
 linkcbl: $(O_FILE)
 	@echo "LD $^"
 	@$(LD) -T$(LDS)
 
-test-qemu: cblos.bin
-	@qemu-system-x86_64 -m 512 -hda cblos.bin
+test-qemu: ../cblos.bin
+	@qemu-system-x86_64 -m 512 -hda $^
 
 debug-qemu: cblos.bin
-	@qemu-system-x86_64 -monitor stdio -no-shutdown -no-reboot -m 1024 -hda cblos.bin
+	@qemu-system-x86_64 -monitor stdio -no-shutdown -no-reboot -m 1024 -hda $^
