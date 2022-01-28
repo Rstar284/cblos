@@ -14,52 +14,38 @@
 ;;      You should have received a copy of the GNU General Public License
 ;;      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;      ======================================================================
+org 0x7c00
+bits 16
 
-[org 0x8000]
 
-jmp EnterProtectedMode
+; BIOS set boot drive in dl; store for later expansion
+mov [BOOT_DRIVE], dl
 
-%include "print.asm"
-%include "gdt.asm"
+;Let's set stack
+mov bp, 0x9000
+mov sp, bp
 
-EnterProtectedMode:
-    call EnableA20
-    cli
-    lgdt [gdt_descriptor]
-    mov eax, cr0
-    or eax, 1
-    mov cr0, eax
-    jmp codeseg:StartProtectedMode
+call load_kernel
+call switch_to_32bit
 
-EnableA20:
-    in al, 0x92
-    or al, 2
-    out 0x92, al
+jmp $
+
+%include "readisk.asm"
+%include "switch_to_32bit.asm"
+
+bits 16
+load_kernel:
+    mov bx, KERNEL_OFFSET ; bx -> Dest
+    mov dh, 2             ; dh -> number of sectors
+    mov dl, [BOOT_DRIVE]  ; dl -> disk
+    call disk_load
     ret
 
-[bits 32]
+; Boot drive var
+BOOT_DRIVE db 0
 
-[extern _start]
+; Padding
+times 510 - ($-$$) db 0
 
-%include "CPUID.asm"
-%include "paging.asm"
-
-StartProtectedMode:
-    ; mov ax, dataseg
-    ; mov ds, ax
-    ; mov ss, ax
-    ; mov es, ax
-    ; mov fs, ax
-    ; mov gs, ax
-
-    call DetectCPUID
-    call DetectLongMode
-    call SetUpPaging
-    call EditGDT
-
-    jmp _start
-    ; If we ever get out of kernel for any reason,
-    ; infinently jump
-    jmp $
-
-times 2048-($-$$) db 0
+; Magic num
+dw 0xaa55

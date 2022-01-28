@@ -15,14 +15,35 @@
 ;;      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;      ======================================================================
 
-PrintString:
-    mov ah, 0x0e
-    .Loop:
-        cmp [bx], byte 0
-        je .Exit
-        mov al, [bx]
-        int 0x10
-        inc bx
-        jmp .Loop
-    .Exit:
-        ret
+;; Adress where we load kernel
+KERNEL_OFFSET equ 0x1000
+
+%include "gdt.asm"
+
+bits 16
+switch_to_32bit:
+    cli                     ; Disable interrupts
+    lgdt [gdt_descriptor]   ; Enable GDT descriptor
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax            ; Enable p mode
+    jmp CODE_SEG:init_32bit ; Farjump
+
+bits 32
+
+BEGIN_32BIT:
+    call KERNEL_OFFSET ; Give control to the kernel
+    jmp $
+
+init_32bit:
+    mov ax, DATA_SEG        ; Update segment registers
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    mov ebp, 0x90000        ; Setup stack
+    mov esp, ebp
+
+    call BEGIN_32BIT        ; Move back to mbr.asm

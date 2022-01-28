@@ -15,32 +15,33 @@
 ;;      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;      ======================================================================
 
-PROGRAM_SPACE equ 0x8000
+disk_load:
+	pusha
+	push dx
 
-ReadDisk:
+	mov ah, 0x02  ; Read mode
+	mov al, dh    ; Read dh num of sectors
+	mov cl, 0x02  ; Start from sector 2 (sector 1 is our boot sect)
+	mov ch, 0x00  ; Cylinder 0
+	mov dh, 0x00  ; Head 0
 
-	mov ah, 0x02
-	mov bx, PROGRAM_SPACE
-	mov al, 32
-	mov dl, [BOOT_DISK]
-	mov ch, 0x00
-	mov dh, 0x00
-	mov cl, 0x02
+	; dl = drive number is set as input to disk_load
+	; es:bx = buffer pointer is set as input as well
 
-	int 0x13
+	int 0x13      ; BIOS int
+	jc disk_error ; Check carry bit for errors
 
-	jc DiskReadFailed
-
+	pop dx        ; Get back original number of sectors to read
+	cmp al, dh    ; BIOS sets al to the # of sectors actally read
+	jne sectors_error
+	popa
 	ret
 
-BOOT_DISK:
-	db 0
+disk_error:
+	jmp disk_loop
 
-DiskReadErrorString:
-	db 'Disk Read Failed',0
+sectors_error:
+	jmp disk_loop
 
-DiskReadFailed:
-	mov bx, DiskReadErrorString
-	call PrintString
-
+disk_loop:
 	jmp $
