@@ -20,7 +20,7 @@ BUILD_DIR := ../bin
 
 
 # File stuff
-C_FILE := kernel.c
+C_FILE := src/kernel.c
 O_FILE := $(BUILD_DIR)/kernel.o
 
 
@@ -42,7 +42,7 @@ COMPILE_FLAGS := -Ttext $(KERN_LOC) $(CFLAGS)
 cblkern: kernel.c
 	@mkdir -p ../bin/
 	@echo "CC $^"
-	@$(CC) -Ttext 0x1000 -ffreestanding -mno-red-zone -c kernel.c -o ../bin/kernel.o
+	@$(CC) -Ttext 0x1000 -ffreestanding -mno-red-zone -c src/kernel.c -o ../bin/kernel.o
 
 linkcbl: $(O_FILE)
 	@echo "LD $^"
